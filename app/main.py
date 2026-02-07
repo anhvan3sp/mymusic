@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from routers import songs
 
 app = FastAPI(title="MyMusic API")
 
-app.include_router(songs.router)
-
+@app.get("/")
+def root():
+    return {"status": "ok", "message": "MyMusic API running"}
