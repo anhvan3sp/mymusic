@@ -1,15 +1,13 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
-from urllib.parse import quote_plus
 
 
-raw_password = os.getenv("DB_PASSWORD")
-password = quote_plus(raw_password)
+
 
 DATABASE_URL = (
-    f"mysql+pymysql://avnadmin:{password}"
-    f"@mysql-1f784f93-anhvan2sp-e73a.aivencloud.com:17593/mymusic"
+   
+    f"mysql+pymysql://avnadmin:AVNS_zZUQx5v6vFp3QLX0T3_@mysql-1f784f93-anhvan2sp-e73a.a.aivencloud.com:17593/mymusic"
 )
 
 
