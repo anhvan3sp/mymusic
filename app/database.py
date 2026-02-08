@@ -1,15 +1,19 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
+
 import os
 
-load_dotenv()  # chỉ có tác dụng ở local
+
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL chưa được cấu hình")
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,   # kiểm tra connection trước khi dùng
+    pool_recycle=300,     # recycle connection sau 5 phút
+)
 SessionLocal = sessionmaker(bind=engine)
 
 Base = declarative_base()
