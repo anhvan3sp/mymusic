@@ -3,15 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <title>MyMusic</title>
+
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    input { padding: 6px; width: 260px; }
-    button { padding: 6px 10px; }
-    .song { border-bottom: 1px solid #ddd; padding: 10px 0; }
-    .title { font-weight: bold; }
-    .meta { color: #555; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input {
+      padding: 6px;
+      width: 260px;
+    }
+    button {
+      padding: 6px 10px;
+      margin-left: 4px;
+      cursor: pointer;
+    }
+    .song {
+      border-bottom: 1px solid #ddd;
+      padding: 12px 0;
+    }
+    .title {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .meta {
+      color: #555;
+      font-size: 14px;
+    }
+    .play-btn {
+      margin-top: 6px;
+      font-size: 14px;
+    }
   </style>
 </head>
+
 <body>
 
   <h1>🎵 MyMusic</h1>
@@ -23,39 +48,111 @@
   <div id="list"></div>
 
   <script>
+    // ======================
+    // CẤU HÌNH API
+    // ======================
     const API_BASE = "https://mymusic-f9fg.onrender.com";
 
+    // chỉ cho 1 bài hát phát tại 1 thời điểm
+    let currentAudio = null;
+    let currentButton = null;
+
+    // ======================
+    // PHÁT NHẠC
+    // ======================
+    function playSong(url, btn) {
+      // nếu đang có bài chạy → dừng bài cũ
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        if (currentButton) {
+          currentButton.textContent = "▶ Phát";
+        }
+      }
+
+      // nếu bấm lại chính bài đang chạy → dừng
+      if (currentButton === btn) {
+        currentAudio = null;
+        currentButton = null;
+        return;
+      }
+
+      // tạo audio mới
+      currentAudio = new Audio(url);
+      currentButton = btn;
+
+      btn.textContent = "⏸ Đang phát";
+      currentAudio.play();
+
+      // khi phát xong → trả nút về trạng thái ban đầu
+      currentAudio.onended = () => {
+        btn.textContent = "▶ Phát";
+        currentAudio = null;
+        currentButton = null;
+      };
+    }
+
+    // ======================
+    // HIỂN THỊ DANH SÁCH BÀI HÁT
+    // ======================
     function renderSongs(data) {
       const list = document.getElementById("list");
       list.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        list.innerHTML = "<p>Không tìm thấy bài hát</p>";
+        return;
+      }
+
       data.forEach(s => {
         const div = document.createElement("div");
         div.className = "song";
+
         div.innerHTML = `
           <div class="title">${s.ten_bn}</div>
           <div class="meta">Nhạc sĩ: ${s.nhac_si}</div>
           <div class="meta">Ca sĩ: ${s.ca_si.join(", ")}</div>
-          <audio controls src="${s.file_nhac}"></audio>
+          <button class="play-btn">▶ Phát</button>
         `;
+
+        // gán sự kiện play (KHÔNG nhét URL trực tiếp vào HTML)
+        div.querySelector(".play-btn").onclick = function () {
+          playSong(s.file_nhac, this);
+        };
+
         list.appendChild(div);
       });
     }
 
+    // ======================
+    // LOAD TẤT CẢ BÀI HÁT
+    // ======================
     async function loadSongs() {
       const res = await fetch(`${API_BASE}/songs`);
       const data = await res.json();
       renderSongs(data);
     }
 
+    // ======================
+    // TÌM KIẾM THEO TÊN BÀI
+    // ======================
     async function searchSong() {
       const q = document.getElementById("search").value.trim();
-      if (!q) return loadSongs();
-      const res = await fetch(`${API_BASE}/songs/search?name=${encodeURIComponent(q)}`);
+      if (!q) {
+        loadSongs();
+        return;
+      }
+
+      const res = await fetch(
+        `${API_BASE}/songs/search?name=${encodeURIComponent(q)}`
+      );
       const data = await res.json();
       renderSongs(data);
     }
 
-    // Load lần đầu
+    // ======================
+    // LOAD KHI MỞ TRANG
+    // ======================
     loadSongs();
   </script>
 
