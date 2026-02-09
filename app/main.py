@@ -11,11 +11,8 @@ def test_db():
     rows = db.execute(text("SELECT mid, ten_bn FROM ban_nhac")).fetchall()
     db.close()
     return [dict(row._mapping) for row in rows]
-app.include_router(
-    songs.router,
-    prefix="/songs",
-    tags=["Songs"]
-)
+app.include_router(songs.router)
+   
 
 @app.get("/")
 def root():
