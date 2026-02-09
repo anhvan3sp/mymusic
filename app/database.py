@@ -2,16 +2,25 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-DATABASE_URL = (
-   
-    f"mysql+pymysql://avnadmin:AVNS_zZUQx5y6vFp3QLX0T3_@mysql-1f784f93-anhvan2sp-e73a.a.aivencloud.com:17593/mymusic"
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(
     DATABASE_URL,
-    pool_pre_ping=True,   # kiểm tra connection trước khi dùng
-    pool_recycle=300,     # recycle connection sau 5 phút
+    pool_pre_ping=True,
+    pool_recycle=300,
 )
-SessionLocal = sessionmaker(bind=engine)
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
 
 Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
