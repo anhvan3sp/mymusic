@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import SessionLocal
-from models import BanNhac, NhacSi, CaSi, BanThuAm
+
+from app.database import SessionLocal
+from app.models import BanNhac, NhacSi, CaSi, BanThuAm
+
 
 router = APIRouter(prefix="/songs", tags=["Songs"])
 
