@@ -29,10 +29,10 @@
     .meta {
       color: #555;
       font-size: 14px;
+      margin-bottom: 6px;
     }
-    .play-btn {
-      margin-top: 6px;
-      font-size: 14px;
+    audio {
+      width: 320px;
     }
   </style>
 </head>
@@ -52,45 +52,6 @@
     // CẤU HÌNH API
     // ======================
     const API_BASE = "https://mymusic-f9fg.onrender.com";
-
-    // chỉ cho 1 bài hát phát tại 1 thời điểm
-    let currentAudio = null;
-    let currentButton = null;
-
-    // ======================
-    // PHÁT NHẠC
-    // ======================
-    function playSong(url, btn) {
-      // nếu đang có bài chạy → dừng bài cũ
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-        if (currentButton) {
-          currentButton.textContent = "▶ Phát";
-        }
-      }
-
-      // nếu bấm lại chính bài đang chạy → dừng
-      if (currentButton === btn) {
-        currentAudio = null;
-        currentButton = null;
-        return;
-      }
-
-      // tạo audio mới
-      currentAudio = new Audio(url);
-      currentButton = btn;
-
-      btn.textContent = "⏸ Đang phát";
-      currentAudio.play();
-
-      // khi phát xong → trả nút về trạng thái ban đầu
-      currentAudio.onended = () => {
-        btn.textContent = "▶ Phát";
-        currentAudio = null;
-        currentButton = null;
-      };
-    }
 
     // ======================
     // HIỂN THỊ DANH SÁCH BÀI HÁT
@@ -112,13 +73,8 @@
           <div class="title">${s.ten_bn}</div>
           <div class="meta">Nhạc sĩ: ${s.nhac_si}</div>
           <div class="meta">Ca sĩ: ${s.ca_si.join(", ")}</div>
-          <button class="play-btn">▶ Phát</button>
+          <audio controls preload="none" src="${s.file_nhac}"></audio>
         `;
-
-        // gán sự kiện play (KHÔNG nhét URL trực tiếp vào HTML)
-        div.querySelector(".play-btn").onclick = function () {
-          playSong(s.file_nhac, this);
-        };
 
         list.appendChild(div);
       });
