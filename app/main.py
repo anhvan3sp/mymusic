@@ -18,4 +18,5 @@ def test_db():
     db = SessionLocal()
     rows = db.execute(text("SELECT mid, ten_bn FROM ban_nhac")).fetchall()
     db.close()
-    return rows
+    return [dict(row._mapping) for row in rows]
+
