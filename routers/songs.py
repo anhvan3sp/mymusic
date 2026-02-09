@@ -37,3 +37,31 @@ def get_all_songs(db: Session = Depends(get_db)):
         })
 
     return result
+@router.get("/search")
+def search_song(name: str, db: Session = Depends(get_db)):
+    songs = (
+        db.query(BanNhac)
+        .filter(BanNhac.ten_bn.ilike(f"%{name}%"))
+        .all()
+    )
+
+    result = []
+    for s in songs:
+        ns = db.query(NhacSi).filter(NhacSi.aid == s.aid).first()
+        cas = (
+            db.query(CaSi.ten_cs)
+            .join(BanThuAm, CaSi.sid == BanThuAm.sid)
+            .filter(BanThuAm.mid == s.mid)
+            .all()
+        )
+
+        result.append({
+            "mid": s.mid,
+            "ten_bn": s.ten_bn,
+            "nhac_si": ns.ten_ns if ns else "",
+            "ca_si": [c[0] for c in cas],
+            "file_nhac": s.file_nhac
+        })
+
+    return result
+
