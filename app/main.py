@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from app.database import SessionLocal
 from sqlalchemy import text
-
+from routers import songs
 app = FastAPI(title="MyMusic API")
 
 
