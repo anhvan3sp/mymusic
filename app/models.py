@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
-from database import Base
+from app.database import Base
+
 
 class NhacSi(Base):
     __tablename__ = "nhac_si"
