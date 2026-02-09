@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>MyMusic</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input { padding: 6px; width: 260px; }
+    button { padding: 6px 10px; }
+    .song { border-bottom: 1px solid #ddd; padding: 10px 0; }
+    .title { font-weight: bold; }
+    .meta { color: #555; }
+  </style>
+</head>
+<body>
+
+  <h1>🎵 MyMusic</h1>
+
+  <input id="search" placeholder="Tìm bài hát theo tên..." />
+  <button onclick="searchSong()">Tìm</button>
+  <button onclick="loadSongs()">Tất cả</button>
+
+  <div id="list"></div>
+
+  <script>
+    const API_BASE = "https://mymusic-f9fg.onrender.com";
+
+    function renderSongs(data) {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      data.forEach(s => {
+        const div = document.createElement("div");
+        div.className = "song";
+        div.innerHTML = `
+          <div class="title">${s.ten_bn}</div>
+          <div class="meta">Nhạc sĩ: ${s.nhac_si}</div>
+          <div class="meta">Ca sĩ: ${s.ca_si.join(", ")}</div>
+          <audio controls src="${s.file_nhac}"></audio>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function loadSongs() {
+      const res = await fetch(`${API_BASE}/songs`);
+      const data = await res.json();
+      renderSongs(data);
+    }
+
+    async function searchSong() {
+      const q = document.getElementById("search").value.trim();
+      if (!q) return loadSongs();
+      const res = await fetch(`${API_BASE}/songs/search?name=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      renderSongs(data);
+    }
+
+    // Load lần đầu
+    loadSongs();
+  </script>
+
+</body>
+</html>
