@@ -18,6 +18,10 @@
       margin-left: 4px;
       cursor: pointer;
     }
+    select {
+      padding: 6px;
+      margin-left: 4px;
+    }
     .song {
       border-bottom: 1px solid #ddd;
       padding: 12px 0;
@@ -41,20 +45,28 @@
 
   <h1>🎵 MyMusic</h1>
 
-  <input id="search" placeholder="Tìm bài hát theo tên..." />
-  <button onclick="searchSong()">Tìm</button>
+  <!-- ===================== -->
+  <!-- KHU VỰC TÌM KIẾM -->
+  <!-- ===================== -->
+
+  <input id="search" placeholder="Nhập nội dung tìm kiếm..." />
+
+  <select id="searchType">
+    <option value="song">Theo tên bài hát</option>
+    <option value="singer">Theo tên ca sĩ</option>
+    <option value="composer">Theo tên nhạc sĩ</option>
+  </select>
+
+  <button onclick="handleSearch()">Tìm</button>
   <button onclick="loadSongs()">Tất cả</button>
 
   <div id="list"></div>
 
   <script>
-    // ======================
-    // CẤU HÌNH API
-    // ======================
     const API_BASE = "https://mymusic-f9fg.onrender.com";
 
     // ======================
-    // HIỂN THỊ DANH SÁCH BÀI HÁT
+    // HIỂN THỊ DANH SÁCH
     // ======================
     function renderSongs(data) {
       const list = document.getElementById("list");
@@ -81,7 +93,7 @@
     }
 
     // ======================
-    // LOAD TẤT CẢ BÀI HÁT
+    // LOAD TẤT CẢ
     // ======================
     async function loadSongs() {
       const res = await fetch(`${API_BASE}/songs`);
@@ -90,25 +102,35 @@
     }
 
     // ======================
-    // TÌM KIẾM THEO TÊN BÀI
+    // XỬ LÝ TÌM KIẾM
     // ======================
-    async function searchSong() {
+    async function handleSearch() {
       const q = document.getElementById("search").value.trim();
+      const type = document.getElementById("searchType").value;
+
       if (!q) {
         loadSongs();
         return;
       }
 
-      const res = await fetch(
-        `${API_BASE}/songs/search?name=${encodeURIComponent(q)}`
-      );
+      let url = "";
+
+      if (type === "song") {
+        url = `${API_BASE}/songs/search?name=${encodeURIComponent(q)}`;
+      }
+      else if (type === "singer") {
+        url = `${API_BASE}/songs/by-ca-si?name=${encodeURIComponent(q)}`;
+      }
+      else if (type === "composer") {
+        url = `${API_BASE}/songs/by-nhac-si?name=${encodeURIComponent(q)}`;
+      }
+
+      const res = await fetch(url);
       const data = await res.json();
       renderSongs(data);
     }
 
-    // ======================
-    // LOAD KHI MỞ TRANG
-    // ======================
+    // Load khi mở trang
     loadSongs();
   </script>
 
